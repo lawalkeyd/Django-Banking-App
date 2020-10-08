@@ -3,12 +3,19 @@
 
     {% block content %}
 
-
-    <div class="page-header">
-      <h1 class="text-center"><small>Dena Bank pvt. ltd.</small></h1>
+   <div class="card">
+    <div class="page-header card-header">
+      <h1 class="text-center"><small>BB Bank</small></h1>
+      <div class="row">
+        <img style="height:200px; width:200px; border-radius:50%; margin:auto" src="{{user.photo.url}}" alt="Photo">
+      </div>
     </div>
-
-<div class="row">
+    <br>
+    <hr>
+<div>
+  
+</div>
+<div class="row card-body">
 
   <div class="col-xs-12 col-md-8 text-left">
     <h4><b>Account Name: </b>{{ user.full_name }}</h4>
@@ -23,12 +30,16 @@
     <h4><b>Account Created: </b>{{ user.date_joined|date:'d-m-Y' }}</h4>
     <h4><b>Account No: </b>{{ user.account_no }}</h4><br><br>
     <div class="well">
-    <h4 class="card"><b>Account Balance: </b>{{ user.balance }} ₹</h4>
+    <h4 class="card"><b>Account Balance: </b>$ {{ user.balance }}</h4>
 
     </div>
   </div>
 
 </div>
+
+
+   </div>
+    
 
 
 

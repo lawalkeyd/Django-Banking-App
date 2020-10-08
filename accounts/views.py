@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.contrib import messages
 
 
 
@@ -32,7 +33,14 @@ from .models import User
 
 
 def home(request):
+    if request.user.is_authenticated:
+        context = {}
+        context['user'] = request.user
+        return render(request, 'accounts/home1.html', context)
     return render(request, 'accounts/home.html')
+
+def hhome(request):
+    return render(request, 'accounts/home.html')    
 
 
 def user_login(request):
@@ -43,7 +51,7 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            return HttpResponseRedirect(reverse('user_success'))
+            return HttpResponseRedirect(reverse('home'))
         else:
             context["error"] = "Provide valid credentials !!"
             return render(request, "accounts/login.html", context)
@@ -105,14 +113,14 @@ def register_view(request):
             password = form.cleaned_data.get("password1")
             user.set_password(password)
             user.save()
-            new_user = authenticate(email=user.email, password=password)
+            new_user = authenticate(username=user.username, password=password)
             login(request, new_user)
 
             return redirect("home")
 
         context = {"title": title, "form": form}
 
-        return render(request, "accounts/form.html", context)
+        return render(request, "accounts/register.html", context)
 
 # def deposit(request):
 #     if not request.user.is_authenticated:
@@ -148,6 +156,10 @@ def deposit(request):
             deposit.user = request.user
             # adds users deposit to balance.
             deposit.user.balance += deposit.amount
+            deposit.Receiver_name = request.user.full_name
+            deposit.Account_number = request.user.account_id
+            deposit.Swift_code = 12334
+            deposit.country ='default'
             deposit.user.save()
             deposit.save()
             messages.success(request, 'You Have Deposited {} $.'
@@ -165,7 +177,7 @@ def withdrawl(request):
     if not request.user.is_authenticated:
         raise Http404
     else:
-        title = "Withdrawl"
+        title = "Transfer"
         form = Withdrawl_form(request.POST or None)
 
         if form.is_valid():
@@ -177,11 +189,12 @@ def withdrawl(request):
                 withdrawal.user.balance -= withdrawal.amount
                 withdrawal.user.save()
                 withdrawal.save()
+                messages.info(request, "Transfer Successful")
                 return redirect("home")
 
             else:
-                return render(request, "Error You Can't Withdraw Please Return To Previous Page"
-                )
+                messages.info(request, "You don't have enough funds to do this")
+                return HttpResponseRedirect(reverse('withdrawl'))
 
         context = {
                     "title": title,
@@ -193,7 +206,16 @@ def withdrawl(request):
 @login_required(login_url="/login/")
 def account_details(request):
     # if request.user.is_authenticated:
-        return render(request, "accounts/account_details.html")
+        return render(request, "accounts/account_details.html")  
+
+
+@login_required(login_url="/login/")
+def transactions(request):
+    my_transactions = Transactions.objects.filter(user=request.user).order_by('timestamp')
+    context = {
+        'transact': my_transactions,
+    }
+    return render(request, 'accounts/my_transactions.html', context)
 
 
 

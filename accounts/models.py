@@ -8,6 +8,7 @@ from django.core.validators import (
 from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+import random
 
 
 
@@ -19,7 +20,7 @@ class UserProfile(AbstractUser):
 
     username = models.CharField('username', max_length=150, unique=True, default="")
     full_name= models.CharField(max_length=50, default="",blank= False)
-    password= models.CharField(max_length=50,blank=False, default="")
+    password= models.CharField(max_length=200,blank=False, default="")
     birth_date = models.DateField(null=True, blank=True)
     email = models.EmailField(unique=True, blank=False)
     contact_no = models.IntegerField(unique=True ,null=True)
@@ -28,13 +29,8 @@ class UserProfile(AbstractUser):
     country = models.CharField(max_length=256)
     nationality = models.CharField(max_length=256)
     occupation = models.CharField(max_length=256)
-    # account_no = models.PositiveIntegerField(
-    #     unique=True,
-    #     validators=[
-    #         MinValueValidator(10000000),
-    #         MaxValueValidator(99999999)
-    #         ]
-    #     )
+    photo = models.ImageField(upload_to='admin/', blank=True, null = True)
+    account_id =  models.IntegerField(unique=True, default=random.randint(000000, 999999))
     balance = models.DecimalField(
         default=0,
         max_digits=12,
@@ -42,8 +38,7 @@ class UserProfile(AbstractUser):
     )
 
 
-    USERNAME_FIELD = 'email'  # use email to log in
-    REQUIRED_FIELDS = ['username']  # required when user is created
+    USERNAME_FIELD = 'username'  # use email to log in
 
     def __str__(self):
         return str(self.username)
@@ -75,6 +70,12 @@ class UserProfile(AbstractUser):
 
 class Transactions(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete= models.CASCADE)
+    Receiver_name = models.CharField(max_length=60)
+    Account_number = models.IntegerField()
+    Bank_name = models.CharField(max_length=120)
+    Swift_code = models.IntegerField()
+    country = models.CharField(max_length=104)
+
 
 
     amount = models.DecimalField(
