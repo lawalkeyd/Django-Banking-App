@@ -1,0 +1,1 @@
+web: gunicorn Django-Banking-App.wsgi --log-file -
